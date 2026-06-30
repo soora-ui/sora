@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sora 空 — админка</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream:#F8F5F0; --rose:#F2E8E4; --lavender:#EBE8F4; --sage:#E4EDEA;
+  --ink:#1C1917; --muted:#6B6760; --accent:#C9A89A; --accent2:#9B93C5;
+  --line:rgba(28,25,23,0.12); --ease:cubic-bezier(0.32,0.72,0,1);
+  --danger:#B5564B;
+}
+body { background:var(--cream); color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:300; line-height:1.6; }
+a { color:var(--accent2); }
+h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
+.wrap { max-width:980px; margin:0 auto; padding:2.5rem 1.5rem 6rem; }
+
+/* header */
+.top { display:flex; align-items:center; justify-content:space-between; margin-bottom:2.5rem; }
+.brand { font-family:'DM Serif Display',serif; font-size:1.5rem; }
+.brand span { font-family:'Noto Serif JP',serif; font-size:0.9rem; color:var(--accent); margin-left:.35rem; }
+.who { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:1rem; }
+
+/* buttons */
+.btn { font-family:inherit; font-size:13px; letter-spacing:.03em; padding:.6rem 1.3rem; border-radius:100px;
+  border:1px solid var(--ink); background:var(--ink); color:var(--cream); cursor:pointer; transition:all .3s var(--ease); }
+.btn:hover { background:transparent; color:var(--ink); }
+.btn.ghost { background:transparent; color:var(--muted); border-color:var(--line); }
+.btn.ghost:hover { color:var(--ink); border-color:var(--ink); }
+.btn.danger { background:transparent; color:var(--danger); border-color:rgba(181,86,75,.4); }
+.btn.danger:hover { background:var(--danger); color:#fff; border-color:var(--danger); }
+.btn.sm { padding:.4rem .9rem; font-size:12px; }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* login */
+.login { max-width:380px; margin:14vh auto 0; }
+.login h1 { font-size:2rem; margin-bottom:.4rem; }
+.login p { color:var(--muted); font-size:14px; margin-bottom:2rem; }
+
+/* form fields */
+.field { margin-bottom:1.25rem; }
+.field label { display:block; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
+.field input[type=text], .field input[type=email], .field input[type=password],
+.field input[type=number], .field input[type=url], .field textarea, .field select {
+  width:100%; font-family:inherit; font-size:14px; color:var(--ink); background:#fff;
+  border:1px solid var(--line); border-radius:.7rem; padding:.7rem .9rem; transition:border-color .25s; }
+.field input:focus, .field textarea:focus, .field select:focus { outline:none; border-color:var(--accent2); }
+.field textarea { resize:vertical; min-height:90px; line-height:1.6; }
+.row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+.hint { font-size:11px; color:var(--muted); margin-top:.4rem; }
+.check { display:flex; align-items:center; gap:.6rem; }
+.check input { width:18px; height:18px; accent-color:var(--accent2); }
+.check label { margin:0; text-transform:none; letter-spacing:0; font-size:14px; color:var(--ink); }
+
+/* list */
+.list-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
+.list-head h2 { font-size:1.6rem; }
+.count-badge { font-size:13px; color:var(--muted); }
+.item { display:flex; align-items:center; gap:1rem; background:#fff; border:1px solid var(--line);
+  border-radius:1rem; padding:1rem 1.25rem; margin-bottom:.75rem; }
+.item .thumb { width:54px; height:54px; border-radius:.6rem; flex-shrink:0; background:var(--lavender);
+  background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center;
+  font-family:'DM Serif Display',serif; color:var(--accent2); }
+.item .meta { flex:1; min-width:0; }
+.item .meta .t { font-family:'DM Serif Display',serif; font-size:1.1rem; }
+.item .meta .s { font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.item .draft { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent);
+  border:1px solid var(--line); border-radius:100px; padding:.15rem .6rem; }
+.item .acts { display:flex; gap:.5rem; flex-shrink:0; }
+
+/* editor */
+.editor { background:#fff; border:1px solid var(--line); border-radius:1.25rem; padding:2rem; }
+.editor h2 { font-size:1.5rem; margin-bottom:1.5rem; }
+.uploads { display:flex; flex-wrap:wrap; gap:.75rem; margin-top:.5rem; }
+.uploads .pic { position:relative; width:96px; height:72px; border-radius:.6rem; overflow:hidden; border:1px solid var(--line); background-size:cover; background-position:center; }
+.uploads .pic button { position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%;
+  border:none; background:rgba(28,25,23,.7); color:#fff; cursor:pointer; font-size:12px; line-height:1; }
+.cover-prev { width:160px; height:100px; border-radius:.7rem; border:1px solid var(--line); background-size:cover; background-position:center; background-color:var(--lavender); }
+.editor-actions { display:flex; gap:.75rem; margin-top:2rem; align-items:center; }
+.spacer { flex:1; }
+
+.toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+  background:var(--ink); color:var(--cream); font-size:13px; padding:.7rem 1.3rem; border-radius:100px;
+  transition:all .3s var(--ease); pointer-events:none; z-index:50; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.err { background:var(--danger); }
+.hidden { display:none !important; }
+.muted-note { font-size:13px; color:var(--muted); background:var(--rose); border-radius:.8rem; padding:1rem 1.25rem; margin-bottom:1.5rem; line-height:1.6; }
+.loading { color:var(--muted); font-size:14px; padding:2rem 0; }
+@media (max-width:640px){ .row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <section id="loginView" class="login hidden">
+    <div class="brand" style="margin-bottom:2rem;">sora<span>空</span></div>
+    <h1>Админка</h1>
+    <p>Вход для управления работами студии.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn" type="submit" id="loginBtn" style="width:100%;">Войти</button>
+    </form>
+  </section>
+
+  <!-- APP -->
+  <section id="appView" class="hidden">
+    <div class="top">
+      <div class="brand">sora<span>空</span></div>
+      <div class="who">
+        <span id="userEmail"></span>
+        <button class="btn ghost sm" id="logoutBtn">Выйти</button>
+      </div>
+    </div>
+
+    <!-- LIST -->
+    <div id="listView">
+      <div class="list-head">
+        <h2>Работы <span class="count-badge" id="countBadge"></span></h2>
+        <button class="btn" id="addBtn">+ Добавить работу</button>
+      </div>
+      <div id="listItems"></div>
+      <div class="loading hidden" id="listLoading">Загрузка…</div>
+      <div class="loading hidden" id="listEmpty">Пока нет работ. Добавь первую →</div>
+    </div>
+
+    <!-- EDITOR -->
+    <div id="editorView" class="editor hidden">
+      <h2 id="editorTitle">Новая работа</h2>
+      <form id="workForm">
+        <input type="hidden" id="f_id">
+
+        <div class="row">
+          <div class="field">
+            <label>Название *</label>
+            <input type="text" id="f_title" required>
+          </div>
+          <div class="field">
+            <label>Метка карточки (tag)</label>
+            <input type="text" id="f_tag" placeholder="saas · booking">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Короткое описание (на карточке)</label>
+          <textarea id="f_short_desc" placeholder="1–2 предложения для карточки в сетке"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Полное описание кейса</label>
+          <textarea id="f_long_desc" style="min-height:160px;" placeholder="Задача, решение, результат — полный текст для модалки кейса"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Год</label>
+            <input type="number" id="f_year" min="2000" max="2099" placeholder="2025">
+          </div>
+          <div class="field">
+            <label>Стек / теги (через запятую)</label>
+            <input type="text" id="f_stack" placeholder="React, Supabase, ЮKassa">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Ссылка на проект</label>
+            <input type="url" id="f_link" placeholder="https://…">
+          </div>
+          <div class="field">
+            <label>Роль / что сделано</label>
+            <input type="text" id="f_role" placeholder="Идея, разработка, запуск">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Обложка</label>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div class="cover-prev" id="coverPrev"></div>
+            <div>
+              <input type="file" id="coverFile" accept="image/*">
+              <div class="hint">Показывается в шапке кейса. Рекомендую 16:10.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Галерея</label>
+          <input type="file" id="galleryFile" accept="image/*" multiple>
+          <div class="uploads" id="galleryList"></div>
+          <div class="hint">Скриншоты внутри кейса. Можно загрузить несколько.</div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Порядок (position)</label>
+            <input type="number" id="f_position" value="0">
+            <div class="hint">Меньше = выше в сетке.</div>
+          </div>
+          <div class="field" style="align-self:end;">
+            <div class="check">
+              <input type="checkbox" id="f_published" checked>
+              <label for="f_published">Опубликовано (видно на сайте)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button class="btn" type="submit" id="saveBtn">Сохранить</button>
+          <button class="btn ghost" type="button" id="cancelBtn">Отмена</button>
+          <div class="spacer"></div>
+          <button class="btn danger" type="button" id="deleteBtn">Удалить</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONFIG WARNING -->
+  <section id="configWarn" class="hidden">
+    <div class="login">
+      <div class="brand" style="margin-bottom:2rem;">sora<span>空</span></div>
+      <h1>Нужна настройка</h1>
+      <div class="muted-note" style="margin-top:1rem;">
+        Заполни <b>config.js</b> — впиши <b>SUPABASE_URL</b> и <b>SUPABASE_ANON_KEY</b>
+        из Supabase → Project Settings → API. Затем выполни <b>supabase-schema.sql</b>
+        в SQL Editor и создай пользователя-админа (Authentication → Users → Add user).
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  const cfg = window.SORA_CONFIG || {};
+  const configured = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('YOUR-PROJECT') && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('YOUR-');
+  const $ = (id) => document.getElementById(id);
+
+  if (!configured) { $('configWarn').classList.remove('hidden'); return; }
+
+  const sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+  let gallery = [];   // текущий список URL галереи в редакторе
+  let coverUrl = '';  // текущая обложка в редакторе
+
+  /* ---------- toast ---------- */
+  let toastT;
+  function toast(msg, isErr){
+    const t = $('toast');
+    t.textContent = msg; t.classList.toggle('err', !!isErr); t.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+
+  /* ---------- auth ---------- */
+  function showView(name){
+    $('loginView').classList.toggle('hidden', name!=='login');
+    $('appView').classList.toggle('hidden', name!=='app');
+  }
+
+  $('loginForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    $('loginBtn').disabled = true; $('loginBtn').textContent = 'Вход…';
+    const { error } = await sb.auth.signInWithPassword({ email:$('email').value.trim(), password:$('password').value });
+    $('loginBtn').disabled = false; $('loginBtn').textContent = 'Войти';
+    if (error) toast(error.message || 'Не удалось войти', true);
+  });
+
+  $('logoutBtn').addEventListener('click', async ()=>{ await sb.auth.signOut(); });
+
+  sb.auth.onAuthStateChange((_event, session)=>{
+    if (session && session.user){
+      $('userEmail').textContent = session.user.email;
+      showView('app'); openList();
+    } else {
+      showView('login');
+    }
+  });
+  // первичная проверка сессии
+  sb.auth.getSession().then(({data})=>{
+    if (!data.session) showView('login');
+  });
+
+  /* ---------- list ---------- */
+  async function openList(){
+    $('listView').classList.remove('hidden');
+    $('editorView').classList.add('hidden');
+    $('listItems').innerHTML = '';
+    $('listEmpty').classList.add('hidden');
+    $('listLoading').classList.remove('hidden');
+
+    const { data, error } = await sb.from('works').select('*').order('position').order('created_at');
+    $('listLoading').classList.add('hidden');
+    if (error){ toast(error.message, true); return; }
+
+    const published = data.filter(w=>w.published).length;
+    $('countBadge').textContent = `· всего ${data.length}, на сайте ${published}`;
+
+    if (!data.length){ $('listEmpty').classList.remove('hidden'); return; }
+
+    data.forEach(w=>{
+      const el = document.createElement('div');
+      el.className = 'item';
+      const thumb = w.cover_url
+        ? `<div class="thumb" style="background-image:url('${w.cover_url}')"></div>`
+        : `<div class="thumb">${(w.title||'?').slice(0,1)}</div>`;
+      el.innerHTML = `
+        ${thumb}
+        <div class="meta">
+          <div class="t">${escapeHtml(w.title||'')} ${w.published?'':'<span class="draft">черновик</span>'}</div>
+          <div class="s">${escapeHtml(w.tag||'')}${w.year?' · '+w.year:''} — ${escapeHtml(w.short_desc||'')}</div>
+        </div>
+        <div class="acts">
+          <button class="btn ghost sm" data-edit="${w.id}">Редактировать</button>
+        </div>`;
+      el.querySelector('[data-edit]').addEventListener('click', ()=>openEditor(w));
+      $('listItems').appendChild(el);
+    });
+  }
+
+  /* ---------- editor ---------- */
+  function openEditor(w){
+    w = w || {};
+    $('editorTitle').textContent = w.id ? 'Редактирование работы' : 'Новая работа';
+    $('f_id').value = w.id || '';
+    $('f_title').value = w.title || '';
+    $('f_tag').value = w.tag || '';
+    $('f_short_desc').value = w.short_desc || '';
+    $('f_long_desc').value = w.long_desc || '';
+    $('f_year').value = w.year || '';
+    $('f_stack').value = (w.stack || []).join(', ');
+    $('f_link').value = w.link || '';
+    $('f_role').value = w.role || '';
+    $('f_position').value = (w.position!=null ? w.position : 0);
+    $('f_published').checked = w.published !== false;
+    coverUrl = w.cover_url || '';
+    gallery = Array.isArray(w.gallery) ? w.gallery.slice() : [];
+    renderCover(); renderGallery();
+    $('coverFile').value=''; $('galleryFile').value='';
+    $('deleteBtn').style.display = w.id ? '' : 'none';
+    $('listView').classList.add('hidden');
+    $('editorView').classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+
+  function renderCover(){
+    $('coverPrev').style.backgroundImage = coverUrl ? `url('${coverUrl}')` : 'none';
+  }
+  function renderGallery(){
+    $('galleryList').innerHTML = '';
+    gallery.forEach((url, i)=>{
+      const pic = document.createElement('div');
+      pic.className = 'pic';
+      pic.style.backgroundImage = `url('${url}')`;
+      pic.innerHTML = `<button type="button" title="Убрать">×</button>`;
+      pic.querySelector('button').addEventListener('click', ()=>{ gallery.splice(i,1); renderGallery(); });
+      $('galleryList').appendChild(pic);
+    });
+  }
+
+  async function uploadImage(file){
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await sb.storage.from('works').upload(path, file, { cacheControl:'3600', upsert:false });
+    if (error) throw error;
+    return sb.storage.from('works').getPublicUrl(path).data.publicUrl;
+  }
+
+  $('coverFile').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if (!file) return;
+    toast('Загрузка обложки…');
+    try { coverUrl = await uploadImage(file); renderCover(); toast('Обложка загружена'); }
+    catch(err){ toast(err.message, true); }
+  });
+
+  $('galleryFile').addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files); if (!files.length) return;
+    toast(`Загрузка (${files.length})…`);
+    try {
+      for (const f of files){ const url = await uploadImage(f); gallery.push(url); }
+      renderGallery(); toast('Галерея обновлена'); e.target.value='';
+    } catch(err){ toast(err.message, true); }
+  });
+
+  $('workForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    $('saveBtn').disabled = true; $('saveBtn').textContent = 'Сохранение…';
+    const payload = {
+      title: $('f_title').value.trim(),
+      tag: val($('f_tag')),
+      short_desc: val($('f_short_desc')),
+      long_desc: val($('f_long_desc')),
+      year: $('f_year').value ? parseInt($('f_year').value,10) : null,
+      stack: $('f_stack').value.split(',').map(s=>s.trim()).filter(Boolean),
+      link: val($('f_link')),
+      role: val($('f_role')),
+      position: parseInt($('f_position').value,10) || 0,
+      published: $('f_published').checked,
+      cover_url: coverUrl || null,
+      gallery: gallery
+    };
+    const id = $('f_id').value;
+    let res;
+    if (id) res = await sb.from('works').update(payload).eq('id', id);
+    else    res = await sb.from('works').insert(payload);
+    $('saveBtn').disabled = false; $('saveBtn').textContent = 'Сохранить';
+    if (res.error){ toast(res.error.message, true); return; }
+    toast('Сохранено');
+    openList();
+  });
+
+  $('deleteBtn').addEventListener('click', async ()=>{
+    const id = $('f_id').value; if (!id) return;
+    if (!confirm('Удалить эту работу безвозвратно?')) return;
+    const { error } = await sb.from('works').delete().eq('id', id);
+    if (error){ toast(error.message, true); return; }
+    toast('Удалено'); openList();
+  });
+
+  $('addBtn').addEventListener('click', ()=>openEditor(null));
+  $('cancelBtn').addEventListener('click', openList);
+
+  /* ---------- utils ---------- */
+  function val(el){ const v = el.value.trim(); return v || null; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+})();
+</script>
+</body>
+</html>

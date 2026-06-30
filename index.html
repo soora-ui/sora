@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sora 空 — студия разработки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:    #F8F5F0;
+  --rose:     #F2E8E4;
+  --lavender: #EBE8F4;
+  --sage:     #E4EDEA;
+  --ink:      #1C1917;
+  --muted:    #6B6760;
+  --accent:   #C9A89A;
+  --accent2:  #9B93C5;
+  --line:     rgba(28,25,23,0.10);
+  --ease:     cubic-bezier(0.32,0.72,0,1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ——— SCROLL PROGRESS ——— */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ——— NAV ——— */
+nav {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(248,245,240,0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 0.5px solid var(--line);
+  border-radius: 100px;
+  padding: 0.6rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  white-space: nowrap;
+  transition: padding 0.5s var(--ease), box-shadow 0.5s var(--ease), top 0.5s var(--ease);
+  animation: navDrop 1s var(--ease) both;
+}
+@keyframes navDrop {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+nav.scrolled {
+  top: 0.75rem;
+  padding: 0.45rem 1.6rem;
+  box-shadow: 0 10px 40px -12px rgba(28,25,23,0.18);
+}
+nav a {
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  transition: color 0.3s;
+  position: relative;
+}
+nav a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -3px;
+  width: 0; height: 1px;
+  background: var(--accent2);
+  transition: width 0.35s var(--ease);
+}
+nav a:hover { color: var(--ink); }
+nav a:hover::after,
+nav a.active::after { width: 100%; }
+nav a.active { color: var(--ink); }
+nav .logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 14px;
+  color: var(--ink);
+  margin-right: 0.5rem;
+}
+nav .logo::after { display: none; }
+
+/* ——— HERO ——— */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 0 6vw;
+  gap: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 55vw;
+  height: 90vh;
+  background: var(--lavender);
+  border-radius: 2rem 0 0 2rem;
+  z-index: 0;
+}
+/* floating soft blobs */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.blob-1 {
+  width: 38vw; height: 38vw;
+  top: -8%; right: 4%;
+  background: radial-gradient(circle at 30% 30%, rgba(155,147,197,0.55), transparent 70%);
+  animation: float1 16s ease-in-out infinite;
+}
+.blob-2 {
+  width: 30vw; height: 30vw;
+  bottom: -10%; right: 22%;
+  background: radial-gradient(circle at 50% 50%, rgba(201,168,154,0.5), transparent 70%);
+  animation: float2 20s ease-in-out infinite;
+}
+.blob-3 {
+  width: 22vw; height: 22vw;
+  top: 30%; left: -6%;
+  background: radial-gradient(circle at 50% 50%, rgba(228,237,234,0.7), transparent 70%);
+  animation: float1 24s ease-in-out infinite reverse;
+}
+@keyframes float1 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(-4%, 6%) scale(1.08); }
+}
+@keyframes float2 {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(5%, -5%) scale(1.06); }
+}
+
+/* ——— SKY / CLOUDS ——— */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cloud {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 100px;
+  filter: blur(7px);
+  will-change: transform;
+  animation: drift linear infinite;
+}
+.cloud::before,
+.cloud::after {
+  content: '';
+  position: absolute;
+  background: #ffffff;
+  border-radius: 50%;
+}
+.cloud::before { width: 50%; height: 170%; top: -70%;  left: 14%; }
+.cloud::after  { width: 38%; height: 135%; top: -45%;  right: 16%; }
+@keyframes drift {
+  from { transform: translateX(-32vw); }
+  to   { transform: translateX(132vw); }
+}
+.cloud-1 { top: 11%; width: 210px; height: 56px; opacity: 0.50; animation-duration: 64s;  animation-delay: -12s; }
+.cloud-2 { top: 27%; width: 140px; height: 42px; opacity: 0.38; animation-duration: 88s;  animation-delay: -45s; }
+.cloud-3 { top: 50%; width: 250px; height: 66px; opacity: 0.44; animation-duration: 72s;  animation-delay: -58s; }
+.cloud-4 { top: 68%; width: 160px; height: 46px; opacity: 0.40; animation-duration: 98s;  animation-delay: -22s; }
+.cloud-5 { top: 6%;  width: 120px; height: 38px; opacity: 0.32; animation-duration: 115s; animation-delay: -75s; }
+.cloud-6 { top: 84%; width: 190px; height: 54px; opacity: 0.40; animation-duration: 82s;  animation-delay: -6s;  }
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+}
+/* staggered hero entrance */
+.hero-text > * { opacity: 0; animation: heroIn 1s var(--ease) both; }
+.hero-text > *:nth-child(1) { animation-delay: 0.15s; }
+.hero-text > *:nth-child(2) { animation-delay: 0.30s; }
+.hero-text > *:nth-child(3) { animation-delay: 0.45s; }
+.hero-text > *:nth-child(4) { animation-delay: 0.60s; }
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 24px;
+  height: 0.5px;
+  background: var(--accent);
+  animation: lineGrow 1.2s var(--ease) 0.5s both;
+  transform-origin: left;
+}
+@keyframes lineGrow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent2);
+  display: inline-block;
+}
+.hero-desc {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 400px;
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+}
+.btn-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.btn {
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  transition: all 0.35s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  will-change: transform;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--cream);
+  border: 1px solid var(--ink);
+}
+.btn-primary:hover {
+  background: transparent;
+  color: var(--ink);
+}
+.btn-primary .arrow { transition: transform 0.35s var(--ease); }
+.btn-primary:hover .arrow { transform: translateX(4px); }
+.btn-ghost {
+  color: var(--muted);
+  border: 0.5px solid var(--line);
+  background: transparent;
+}
+.btn-ghost:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.hero-visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 3rem 0;
+}
+.stat-card {
+  background: rgba(248,245,240,0.7);
+  border: 0.5px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px -20px rgba(28,25,23,0.25);
+}
+.stat-card.wide { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+.stat-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.stat-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Japanese vertical text accent */
+.jp-accent {
+  position: absolute;
+  right: -1.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  opacity: 0.5;
+  white-space: nowrap;
+}
+
+/* ——— SECTION BASE ——— */
+section {
+  padding: 8rem 6vw;
+}
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+.section-num {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  padding-top: 0.4rem;
+  white-space: nowrap;
+}
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.section-title em {
+  font-style: italic;
+  color: var(--accent2);
+}
+.section-sub {
+  font-size: 14px;
+  color: var(--muted);
+  max-width: 420px;
+  margin-top: 0.75rem;
+  line-height: 1.8;
+}
+
+/* ——— PROJECTS BENTO ——— */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(180px, auto);
+  gap: 1rem;
+  perspective: 1400px;
+}
+.card {
+  border-radius: 1.5rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.35), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  pointer-events: none;
+}
+.card:hover::after { opacity: 1; }
+.card:hover { box-shadow: 0 30px 60px -28px rgba(28,25,23,0.35); }
+.card-inner { transform: translateZ(30px); position: relative; z-index: 2; }
+.card-tag {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 100px;
+  border: 0.5px solid currentColor;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+.card-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  opacity: 0.65;
+  max-width: 320px;
+}
+.card-link {
+  position: absolute;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0.5px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.35;
+  text-decoration: none;
+  color: inherit;
+  font-size: 14px;
+  transition: opacity 0.3s var(--ease), transform 0.4s var(--ease);
+  z-index: 3;
+}
+.card:hover .card-link { opacity: 0.85; transform: translate(2px,-2px); }
+
+.card-big-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(5rem, 10vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  position: absolute;
+  bottom: -0.15em;
+  right: -0.05em;
+  opacity: 0.07;
+  letter-spacing: -0.04em;
+  z-index: 1;
+}
+
+/* ——— SKILLS ——— */
+.skills-section { background: var(--rose); }
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0;
+}
+.skill-item {
+  padding: 2.5rem 2rem;
+  border-right: 0.5px solid var(--line);
+  border-bottom: 0.5px solid var(--line);
+  transition: background 0.3s, transform 0.4s var(--ease);
+}
+.skill-item:hover { background: rgba(255,255,255,0.4); transform: translateY(-3px); }
+.skill-icon {
+  font-size: 24px;
+  margin-bottom: 1rem;
+  transition: transform 0.5s var(--ease);
+  display: inline-block;
+}
+.skill-item:hover .skill-icon { transform: rotate(180deg) scale(1.1); }
+.skill-name {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+.skill-detail {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ——— ABOUT ——— */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+.about-photo-wrap {
+  position: relative;
+}
+.about-photo {
+  width: 100%;
+  aspect-ratio: 4/5;
+  border-radius: 1.5rem;
+  background: var(--lavender);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.about-initials {
+  font-family: 'DM Serif Display', serif;
+  font-size: 6rem;
+  color: var(--accent2);
+  opacity: 0.4;
+  font-style: italic;
+}
+.about-photo-tag {
+  position: absolute;
+  bottom: -1rem;
+  left: -1rem;
+  background: var(--cream);
+  border: 0.5px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 14px 30px -18px rgba(28,25,23,0.3);
+}
+.about-photo-tag .big { font-family: 'DM Serif Display', serif; font-size: 1.8rem; }
+.about-photo-tag .small { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.about-text p {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  line-height: 1.85;
+}
+.about-text p strong { color: var(--ink); font-weight: 500; }
+
+/* ——— CONTACT ——— */
+.contact-section {
+  background: var(--ink);
+  color: var(--cream);
+  text-align: center;
+  padding: 10rem 6vw;
+  position: relative;
+  overflow: hidden;
+}
+.contact-section::before {
+  content: '';
+  position: absolute;
+  width: 50vw; height: 50vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(155,147,197,0.18), transparent 70%);
+  top: -20%; left: 50%;
+  transform: translateX(-50%);
+  filter: blur(40px);
+  animation: float2 18s ease-in-out infinite;
+}
+.contact-section > * { position: relative; z-index: 1; }
+.contact-section .section-title { color: var(--cream); }
+.contact-section .section-title em { color: var(--accent); }
+.contact-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+.contact-links a {
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 2rem;
+  border-radius: 100px;
+  border: 0.5px solid rgba(248,245,240,0.2);
+  color: rgba(248,245,240,0.7);
+  transition: all 0.35s var(--ease);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.contact-links a:hover {
+  border-color: var(--cream);
+  color: var(--cream);
+  background: rgba(248,245,240,0.08);
+  transform: translateY(-3px);
+}
+
+/* ——— FOOTER ——— */
+footer {
+  background: var(--ink);
+  color: rgba(248,245,240,0.35);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  padding: 1.5rem 6vw;
+  display: flex;
+  justify-content: space-between;
+  border-top: 0.5px solid rgba(248,245,240,0.06);
+}
+
+/* ——— SCROLL ANIMATIONS ——— */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* ——— MOBILE ——— */
+@media (max-width: 768px) {
+  nav { gap: 1.25rem; padding: 0.5rem 1.25rem; }
+  nav .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 4rem; gap: 3rem; }
+  .hero::before { display: none; }
+  .hero-visual { display: none; }
+  .blob { filter: blur(40px); opacity: 0.35; }
+  section { padding: 5rem 1.5rem; }
+  .section-header { flex-direction: column; gap: 1rem; }
+  .bento { grid-template-columns: 1fr; perspective: none; }
+  .card { grid-column: 1 / -1 !important; grid-row: auto !important; transform: none !important; }
+  .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+  .skills-grid { grid-template-columns: 1fr 1fr; }
+  footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+
+/* ——— CASE MODAL ——— */
+.case-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(28,25,23,0.45);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 4vh 1.5rem; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+.case-overlay.open { opacity: 1; pointer-events: auto; }
+.case-modal {
+  background: var(--cream); border-radius: 1.5rem; max-width: 880px; width: 100%;
+  max-height: 92vh; overflow-y: auto; position: relative;
+  transform: translateY(24px) scale(0.98); transition: transform 0.5s var(--ease);
+  box-shadow: 0 40px 90px -30px rgba(28,25,23,0.55);
+}
+.case-overlay.open .case-modal { transform: none; }
+.case-close {
+  position: absolute; top: 1rem; right: 1rem; z-index: 4;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: rgba(248,245,240,0.9); color: var(--ink); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s var(--ease);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.case-close:hover { transform: rotate(90deg); }
+.case-cover { width: 100%; aspect-ratio: 16/9; background: var(--lavender); background-size: cover; background-position: center; }
+.case-cover.empty { aspect-ratio: 16/5; display: flex; align-items: center; justify-content: center; }
+.case-cover.empty::after { content: '空'; font-family: 'Noto Serif JP', serif; font-size: 3rem; color: var(--accent2); opacity: 0.5; }
+.case-body { padding: 2.5rem 2.5rem 3rem; }
+.case-eyebrow { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+.case-modal h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.1; margin-bottom: 1rem; }
+.case-stack { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
+.case-stack span { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border: 0.5px solid var(--line); border-radius: 100px; padding: 0.3rem 0.8rem; }
+.case-role { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
+.case-role b { color: var(--ink); font-weight: 500; }
+.case-long { font-size: 15px; line-height: 1.85; color: var(--muted); white-space: pre-wrap; margin-bottom: 2rem; }
+.case-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+.case-gallery img { width: 100%; border-radius: 0.9rem; border: 0.5px solid var(--line); display: block; }
+.case-link { display: inline-flex; }
+@media (max-width: 640px) { .case-body { padding: 1.75rem 1.5rem 2.5rem; } }
+
+/* ——— REDUCED MOTION ——— */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .hero-text > * { opacity: 1; }
+  .card { transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- SKY / плывущие облака (фон всего сайта) -->
+<div class="sky" aria-hidden="true">
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+  <div class="cloud cloud-5"></div>
+  <div class="cloud cloud-6"></div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="logo">sora<span style="font-family:'Noto Serif JP',serif;font-size:11px;color:var(--accent);margin-left:0.35rem;">空</span></a>
+  <div class="nav-links" style="display:flex;align-items:center;gap:2.5rem;">
+    <a href="#work">Работы</a>
+    <a href="#skills">Навыки</a>
+    <a href="#about">О себе</a>
+    <a href="#contact">Контакты</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="hero-text">
+    <div class="hero-eyebrow">студия разработки · продукты · ai</div>
+    <h1>sora<br><em>строит</em><br>продукты</h1>
+    <p class="hero-desc">Небольшая студия. 5 лет создаём веб-приложения, ботов и инструменты для реального рынка — быстро, точно, с вниманием к деталям.</p>
+    <div class="btn-group">
+      <a href="#work" class="btn btn-primary">Смотреть работы <span class="arrow">→</span></a>
+      <a href="#contact" class="btn btn-ghost">Написать мне</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="stat-card reveal">
+      <div>
+        <div class="stat-big" data-count="5">0</div>
+        <div class="stat-label">лет с AI</div>
+      </div>
+      <div class="stat-sub" style="text-align:right;max-width:120px;font-size:12px;color:var(--muted);">продакшн-продукты с нуля</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+      <div class="stat-card wide reveal reveal-d1">
+        <div class="stat-big" id="workCountHero" data-count="0">0</div>
+        <div class="stat-label">продуктов</div>
+      </div>
+      <div class="stat-card wide reveal reveal-d2" style="background:var(--lavender);">
+        <div class="stat-big" style="color:var(--accent2);">∞</div>
+        <div class="stat-label">итераций</div>
+      </div>
+    </div>
+    <div class="stat-card reveal reveal-d3" style="background:var(--rose);">
+      <div class="stat-label" style="font-size:13px;max-width:200px;line-height:1.5;">Из идеи — в продукт, с нуля до прода</div>
+      <div style="font-family:'Noto Serif JP',serif;font-size:11px;letter-spacing:0.2em;color:var(--accent);opacity:0.7;">自由</div>
+    </div>
+    <div style="position:relative;">
+      <span class="jp-accent">ものづくり · создание вещей</span>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work" style="padding-top:6rem;">
+  <div class="section-header reveal">
+    <div class="section-num">01 · 仕事</div>
+    <div>
+      <div class="section-title">Выбранные<br><em>работы</em></div>
+      <div class="section-sub">Продукты, которые работают в реальном мире и решают конкретные задачи. Сейчас на сайте <strong id="workCountInline" style="color:var(--ink);font-weight:500;">—</strong>.</div>
+    </div>
+  </div>
+
+  <div class="bento" id="bento">
+    <!-- Карточки рендерятся из массива works (см. скрипт ниже). -->
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="skills-section">
+  <div class="section-header reveal">
+    <div class="section-num">02 · 技術</div>
+    <div>
+      <div class="section-title">Стек и<br><em>подход</em></div>
+      <div class="section-sub">Инструменты, с которыми я работаю ежедневно.</div>
+    </div>
+  </div>
+
+  <div class="skills-grid reveal">
+    <div class="skill-item">
+      <div class="skill-icon">⬡</div>
+      <div class="skill-name">AI & Agents</div>
+      <div class="skill-detail">Claude Code, Cursor, MCP-серверы, RAG-системы, AI-агенты</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-icon">◈</div>
+      <div class="skill-name">Frontend</div>
+      <div class="skill-detail">React, Vite, TypeScript, Tailwind CSS</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-icon">◇</div>
+      <div class="skill-name">Backend</div>
+      <div class="skill-detail">Supabase, PostgreSQL, Node.js, Python</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-icon">○</div>
+      <div class="skill-name">Deploy</div>
+      <div class="skill-detail">Vercel, Docker, CI/CD пайплайны</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-icon">△</div>
+      <div class="skill-name">Payments</div>
+      <div class="skill-detail">ЮKassa, Tinkoff, Telegram Payments</div>
+    </div>
+    <div class="skill-item">
+      <div class="skill-icon">□</div>
+      <div class="skill-name">Product</div>
+      <div class="skill-detail">Идея → MVP → запуск, CIS-рынок, B2C SaaS</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-header reveal">
+    <div class="section-num">03 · スタジオ</div>
+    <div>
+      <div class="section-title">О<br><em>студии</em></div>
+    </div>
+  </div>
+
+  <div class="about-grid">
+    <div class="about-photo-wrap reveal">
+      <div class="about-photo">
+        <span class="about-initials" style="font-family:'Noto Serif JP',serif;font-style:normal;font-size:7rem;">空</span>
+      </div>
+      <div class="about-photo-tag">
+        <div class="big">5+</div>
+        <div class="small">лет в AI-разработке</div>
+      </div>
+    </div>
+    <div class="about-text reveal reveal-d1">
+      <p><strong>sora</strong> (空) — «небо, пустота». Небольшая студия разработки, где из чистого листа рождаются продукты.</p>
+      <p>Берём идею, быстро проверяем на жизнеспособность и доводим до продакшна. Строим <strong>реальные продукты</strong> для реального рынка — CIS, Россия.</p>
+      <p>Предпочитаем веб-приложения как более стабильную платформу. Внимание к деталям и весь цикл: <strong>идея, валидация, стек, запуск, рост</strong>.</p>
+      <p style="font-family:'Noto Serif JP',serif;font-size:13px;letter-spacing:0.2em;color:var(--accent);margin-top:2rem;">プロダクトを作る喜び</p>
+      <p style="font-size:11px;color:var(--muted);margin-top:0.3rem;letter-spacing:0.05em;">радость создавать продукты</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section">
+  <div class="reveal">
+    <div class="section-title" style="margin-bottom:1rem;">Давайте<br><em>поговорим</em></div>
+    <div class="section-sub" style="color:rgba(248,245,240,0.5);max-width:400px;margin:0 auto;font-size:15px;">
+      Есть задача, идея или хотите поработать вместе — пишите, всегда рад интересным проектам.
+    </div>
+    <div class="contact-links">
+      <a href="https://t.me/temakamenkov">✦ Telegram</a>
+      <a href="mailto:hello@example.com">✦ Email</a>
+      <a href="https://github.com/temakamenkov">✦ GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 sora studio · 空</span>
+  <span style="font-family:'Noto Serif JP',serif;letter-spacing:0.2em;">作り続ける</span>
+</footer>
+
+<!-- CASE MODAL -->
+<div class="case-overlay" id="caseOverlay" aria-hidden="true">
+  <div class="case-modal" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+    <button class="case-close" id="caseClose" aria-label="Закрыть">×</button>
+    <div class="case-cover" id="caseCover"></div>
+    <div class="case-body">
+      <div class="case-eyebrow" id="caseEyebrow"></div>
+      <h2 id="caseTitle"></h2>
+      <div class="case-stack" id="caseStack"></div>
+      <p class="case-role" id="caseRole"></p>
+      <div class="case-long" id="caseLong"></div>
+      <div class="case-gallery" id="caseGallery"></div>
+      <a class="btn btn-primary case-link" id="caseLink" target="_blank" rel="noopener">Открыть проект →</a>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+/* ============================================================
+   ДАННЫЕ РАБОТ
+   На следующем шаге этот массив будет приходить из Supabase
+   (один fetch заменит const works). Структура полей уже готова
+   под карточку-кейс с полным редактированием через админку.
+   Демо-массив ниже используется как фолбэк, если Supabase ещё
+   не настроен (config.js) или запрос не удался.
+   ============================================================ */
+const DEMO_WORKS = [
+  {
+    id: 'okno',
+    tag: 'saas · booking',
+    title: 'okno',
+    desc: 'Система записи и управления клиентами для beauty-мастеров. Рейтинг надёжности, предоплаты через ЮKassa, AI-консультации.',
+    link: '#'
+  },
+  {
+    id: 'tarot-bot',
+    tag: 'telegram · bot',
+    title: 'Tarot Bot',
+    desc: 'Бот с платёжной системой. Персонализированные расклады, подписки, Telegram Payments.',
+    link: '#'
+  },
+  {
+    id: 'team-analytics',
+    tag: 'analytics · hr',
+    title: 'Team Analytics',
+    desc: 'Бот для расчёта выплат и аналитики команды. Автоматизация операционки.',
+    link: '#'
+  },
+  {
+    id: 'smeta-pdf',
+    tag: 'react · pdf',
+    title: 'Смета PDF',
+    desc: 'MVP для строительных бригад — быстрое создание смет с экспортом в PDF.',
+    link: '#'
+  },
+  {
+    id: 'transport',
+    tag: 'tracking',
+    title: 'Transport',
+    desc: 'Трекинг транспорта в реальном времени.',
+    link: '#'
+  },
+  {
+    id: 'automation',
+    tag: 'ai · automation',
+    title: 'Личная автоматизация',
+    desc: 'Инструменты для автоматизации документооборота и персональных процессов. AI-агенты для рутинных задач.',
+    link: '#'
+  }
+];
+
+/* Текущий список работ (по умолчанию демо, заменяется данными из Supabase) */
+let works = DEMO_WORKS.slice();
+
+/* Клиент Supabase — создаётся только если config.js заполнен и CDN загрузился */
+const SB = (window.supabase && window.SORA_CONFIG &&
+  !/YOUR-/.test((window.SORA_CONFIG.SUPABASE_URL || '') + (window.SORA_CONFIG.SUPABASE_ANON_KEY || '')))
+  ? window.supabase.createClient(window.SORA_CONFIG.SUPABASE_URL, window.SORA_CONFIG.SUPABASE_ANON_KEY)
+  : null;
+
+/* Палитра и раскладка bento — повторяются циклично для любого числа работ */
+const palette = [
+  { bg: 'var(--rose)',     fg: '#3D2620' },
+  { bg: 'var(--lavender)', fg: '#2D2A4A' },
+  { bg: 'var(--sage)',     fg: '#1A3028' },
+  { bg: '#EDE8DC',         fg: '#3A3020' },
+  { bg: '#F0E8F0',         fg: '#3A2040' },
+  { bg: '#E8EDF0',         fg: '#1C2830' },
+];
+/* [колонки, ряды] — паттерн на 6 карточек, идеально замощает 12 колонок */
+const layout = [ [7,2], [5,1], [5,1], [4,1], [4,1], [4,1] ];
+
+function renderWorks() {
+  const bento = document.getElementById('bento');
+  bento.innerHTML = '';
+  works.forEach((w, i) => {
+    const pal = palette[i % palette.length];
+    const [col, row] = layout[i % layout.length];
+    const card = document.createElement('article');
+    card.className = 'card reveal' + (i % 3 === 1 ? ' reveal-d1' : i % 3 === 2 ? ' reveal-d2' : '');
+    card.style.background = pal.bg;
+    card.style.color = pal.fg;
+    card.style.gridColumn = 'span ' + col;
+    card.style.gridRow = 'span ' + row;
+    const num = String(i + 1).padStart(2, '0');
+    card.innerHTML = `
+      <div class="card-inner">
+        <span class="card-tag">${w.tag || ''}</span>
+        <h3 class="card-title">${w.title || ''}</h3>
+        <p class="card-desc">${w.desc || ''}</p>
+      </div>
+      <span class="card-big-num">${num}</span>
+      <span class="card-link" aria-hidden="true">↗</span>
+    `;
+    card.addEventListener('click', () => openCase(w));
+    bento.appendChild(card);
+  });
+  attachTilt();
+  observeReveals();
+  updateWorkCount();
+}
+
+/* Автоподсчёт работ */
+function updateWorkCount() {
+  const n = works.length;
+  const inline = document.getElementById('workCountInline');
+  if (inline) inline.textContent = n + ' ' + plural(n, ['работа', 'работы', 'работ']);
+  const hero = document.getElementById('workCountHero');
+  if (hero) hero.setAttribute('data-count', n);
+}
+function plural(n, forms) {
+  const n10 = n % 10, n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return forms[0];
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+  return forms[2];
+}
+
+/* Count-up для чисел со стат-карточек */
+function animateCount(el) {
+  const target = parseInt(el.getAttribute('data-count'), 10) || 0;
+  if (el.dataset.done === '1') return;
+  el.dataset.done = '1';
+  const dur = 1100;
+  let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * eased);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+/* Reveal-наблюдатель (+ запуск count-up) */
+let revealObs;
+function observeReveals() {
+  if (!revealObs) {
+    revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          e.target.querySelectorAll('[data-count]').forEach(animateCount);
+          if (e.target.matches('[data-count]')) animateCount(e.target);
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+  }
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObs.observe(el));
+}
+
+/* 3D-наклон карточек по курсору */
+function attachTilt() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(max-width: 768px)').matches) return;
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rx = (0.5 - py) * 8;
+      const ry = (px - 0.5) * 8;
+      card.style.transform = `translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      card.style.setProperty('--mx', (px * 100) + '%');
+      card.style.setProperty('--my', (py * 100) + '%');
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+
+/* Магнитные кнопки */
+function attachMagnetic() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2;
+      const y = e.clientY - r.top - r.height / 2;
+      btn.style.transform = `translate(${x * 0.18}px, ${y * 0.28}px)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+}
+
+/* Nav: скролл-прогресс, состояние, активная ссылка */
+function initScrollUI() {
+  const nav = document.getElementById('nav');
+  const bar = document.getElementById('scrollProgress');
+  const sections = ['work', 'skills', 'about', 'contact'].map(id => document.getElementById(id)).filter(Boolean);
+  const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+
+  function onScroll() {
+    const st = window.scrollY;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (st / h) * 100 : 0) + '%';
+    nav.classList.toggle('scrolled', st > 50);
+
+    let current = '';
+    sections.forEach(s => {
+      if (s.getBoundingClientRect().top <= window.innerHeight * 0.4) current = s.id;
+    });
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
+/* ——— CASE MODAL ——— */
+function openCase(w) {
+  const ov = document.getElementById('caseOverlay');
+  const cover = document.getElementById('caseCover');
+  if (w.cover_url) { cover.style.backgroundImage = `url('${w.cover_url}')`; cover.classList.remove('empty'); }
+  else { cover.style.backgroundImage = 'none'; cover.classList.add('empty'); }
+
+  document.getElementById('caseEyebrow').textContent = [w.tag, w.year].filter(Boolean).join(' · ');
+  document.getElementById('caseTitle').textContent = w.title || '';
+
+  const stack = document.getElementById('caseStack');
+  stack.innerHTML = '';
+  (w.stack || []).forEach(s => { const sp = document.createElement('span'); sp.textContent = s; stack.appendChild(sp); });
+
+  const role = document.getElementById('caseRole');
+  if (w.role) { role.innerHTML = '<b>Роль:</b> ' + escapeHtml(w.role); role.style.display = ''; }
+  else { role.style.display = 'none'; }
+
+  document.getElementById('caseLong').textContent = w.long_desc || w.desc || '';
+
+  const g = document.getElementById('caseGallery');
+  g.innerHTML = '';
+  (w.gallery || []).forEach(url => { const im = document.createElement('img'); im.src = url; im.loading = 'lazy'; im.alt = w.title || ''; g.appendChild(im); });
+
+  const link = document.getElementById('caseLink');
+  if (w.link && w.link !== '#') { link.href = w.link; link.style.display = ''; }
+  else { link.style.display = 'none'; }
+
+  ov.classList.add('open');
+  ov.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+function closeCase() {
+  const ov = document.getElementById('caseOverlay');
+  ov.classList.remove('open');
+  ov.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+document.getElementById('caseClose').addEventListener('click', closeCase);
+document.getElementById('caseOverlay').addEventListener('click', (e) => { if (e.target.id === 'caseOverlay') closeCase(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCase(); });
+
+/* ——— LOAD WORKS (Supabase → fallback DEMO_WORKS) ——— */
+async function loadWorks() {
+  if (SB) {
+    try {
+      const { data, error } = await SB.from('works')
+        .select('*').eq('published', true)
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: true });
+      if (error) throw error;
+      if (data && data.length) {
+        works = data.map(r => ({
+          id: r.id, tag: r.tag, title: r.title, desc: r.short_desc,
+          long_desc: r.long_desc, year: r.year, stack: r.stack || [],
+          role: r.role, link: r.link, cover_url: r.cover_url, gallery: r.gallery || []
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase: не удалось загрузить работы, показываю демо-данные —', e.message);
+    }
+  }
+  renderWorks();
+}
+
+/* INIT */
+observeReveals();
+attachMagnetic();
+initScrollUI();
+loadWorks();
+</script>
+</body>
+</html>
