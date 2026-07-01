@@ -1055,7 +1055,13 @@ function updateWorkCount() {
   const inline = document.getElementById('workCountInline');
   if (inline) inline.textContent = n + ' ' + plural(n, ['работа', 'работы', 'работ']);
   const hero = document.getElementById('workCountHero');
-  if (hero) hero.setAttribute('data-count', n);
+  if (hero) {
+    hero.setAttribute('data-count', n);
+    // Данные приходят из Supabase уже после того, как count-up мог отработать
+    // на начальном 0 — сбрасываем флаг и пересчитываем под актуальное число.
+    hero.dataset.done = '';
+    animateCount(hero);
+  }
 }
 function plural(n, forms) {
   const n10 = n % 10, n100 = n % 100;
