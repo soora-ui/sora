@@ -409,6 +409,8 @@ section {
 .card:hover::after { opacity: 1; }
 .card:hover { box-shadow: 0 30px 60px -28px rgba(28,25,23,0.35); }
 .card-inner { transform: translateZ(30px); position: relative; z-index: 2; }
+.card-art { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.card.has-cover { background-size: cover; background-position: center; }
 .card-tag {
   display: inline-block;
   font-size: 10px;
@@ -938,7 +940,8 @@ const DEMO_WORKS = [
     tag: 'saas · booking',
     title: 'okno',
     desc: 'Система записи и управления клиентами для beauty-мастеров. Рейтинг надёжности, предоплаты через ЮKassa, AI-консультации.',
-    link: '#'
+    link: '#',
+    flow_url: 'okno-flow.html'
   },
   {
     id: 'tarot-bot',
@@ -953,14 +956,16 @@ const DEMO_WORKS = [
     tag: 'analytics · hr',
     title: 'Team Analytics',
     desc: 'Бот для расчёта выплат и аналитики команды. Автоматизация операционки.',
-    link: '#'
+    link: '#',
+    flow_url: 'team-flow.html'
   },
   {
     id: 'smeta-pdf',
     tag: 'react · pdf',
     title: 'Смета PDF',
     desc: 'MVP для строительных бригад — быстрое создание смет с экспортом в PDF.',
-    link: '#'
+    link: '#',
+    flow_url: 'smeta-flow.html'
   },
   {
     id: 'transport',
@@ -975,7 +980,8 @@ const DEMO_WORKS = [
     tag: 'ai · automation',
     title: 'Личная автоматизация',
     desc: 'Инструменты для автоматизации документооборота и персональных процессов. AI-агенты для рутинных задач.',
-    link: '#'
+    link: '#',
+    flow_url: 'automation-flow.html'
   },
   {
     id: 'traffbot',
@@ -1029,7 +1035,17 @@ function renderWorks() {
     card.style.gridColumn = 'span ' + col;
     card.style.gridRow = 'span ' + row;
     const num = String(i + 1).padStart(2, '0');
+    // Обложка: реальный скрин (cover_url) поверх, иначе — сгенерированный паттерн в палитре
+    let art = '';
+    if (w.cover_url) {
+      card.classList.add('has-cover');
+      card.style.backgroundImage =
+        `linear-gradient(to bottom, ${hexToRgba(pal.bg, 0.92)} 0%, ${hexToRgba(pal.bg, 0.55)} 45%, ${hexToRgba(pal.bg, 0.12)} 100%), url('${w.cover_url}')`;
+    } else {
+      art = coverSVG(i, pal.fg);
+    }
     card.innerHTML = `
+      ${art}
       <div class="card-inner">
         <span class="card-tag">${w.tag || ''}</span>
         <h3 class="card-title">${w.title || ''}</h3>
@@ -1044,6 +1060,45 @@ function renderWorks() {
   attachTilt();
   observeReveals();
   updateWorkCount();
+}
+
+/* Сгенерированная обложка-паттерн в палитре бренда (когда нет реального скрина) */
+function coverSVG(i, fg) {
+  const P = [ [76,26,22,80], [26,24,80,74], [82,72,30,20], [32,78,72,24], [60,18,16,64], [20,58,78,34] ];
+  const p = P[i % P.length];
+  const g = 'cg' + i;
+  return `<svg class="card-art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <radialGradient id="${g}a" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#9B93C5" stop-opacity="0.5"/>
+        <stop offset="100%" stop-color="#9B93C5" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="${g}b" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#C9A89A" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="#C9A89A" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="${p[0]*4}" cy="${p[1]*3}" r="155" fill="url(#${g}a)"/>
+    <circle cx="${p[2]*4}" cy="${p[3]*3}" r="125" fill="url(#${g}b)"/>
+    ${coverShape(i % 6, fg)}
+  </svg>`;
+}
+function coverShape(k, fg) {
+  const s = `stroke="${fg}" stroke-opacity="0.15" fill="none" stroke-width="2"`;
+  switch (k) {
+    case 0: return `<circle cx="312" cy="78" r="58" ${s}/>`;
+    case 1: return `<circle cx="312" cy="78" r="58" ${s}/><circle cx="312" cy="78" r="36" ${s}/>`;
+    case 2: return `<path d="M312 30 L364 122 L260 122 Z" ${s} stroke-linejoin="round"/>`;
+    case 3: return `<rect x="266" y="36" width="90" height="90" rx="12" ${s}/>`;
+    case 4: return `<rect x="268" y="38" width="84" height="84" rx="10" transform="rotate(45 310 80)" ${s}/>`;
+    default: return `<path d="M312 26 L366 57 L366 119 L312 150 L258 119 L258 57 Z" ${s} stroke-linejoin="round"/>`;
+  }
+}
+/* #RRGGBB → rgba() со scrim-прозрачностью для читаемости текста поверх фото */
+function hexToRgba(hex, a) {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
 /* Автоподсчёт работ */
