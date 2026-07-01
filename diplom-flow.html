@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Транспортная система — user flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f1f0ec;
+    --bg-deep: #e5e3dc;
+    --card: #fffefb;
+    --ink: #1f2937;
+    --ink-soft: #626c78;
+    --line: rgba(31,41,55,0.14);
+    --steel: #3f6a86;
+    --amber: #c9863d;
+    --shadow: 0 20px 45px -30px rgba(31,41,55,0.35);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(63,106,134,0.12), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(201,134,61,0.10), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:120px 0 90px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .blueprint{
+    position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(63,106,134,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(63,106,134,0.08) 1px, transparent 1px);
+    background-size:38px 38px;
+    -webkit-mask-image: radial-gradient(ellipse 600px 380px at 50% 20%, black, transparent 75%);
+            mask-image: radial-gradient(ellipse 600px 380px at 50% 20%, black, transparent 75%);
+    opacity:.9;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--steel);
+    margin-bottom:22px;
+  }
+  h1.title{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:clamp(38px, 7vw, 72px);
+    line-height:1.05;
+    margin:0 0 20px;
+    letter-spacing:.01em;
+  }
+  h1.title em{
+    font-style:italic;
+    font-weight:500;
+    color:var(--steel);
+  }
+  .subtitle{
+    max-width:540px;
+    margin:0 auto;
+    color:var(--ink-soft);
+    font-size:17px;
+    line-height:1.6;
+  }
+  .hero-badges{
+    margin-top:38px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,254,251,0.65);
+    color:var(--ink-soft);
+  }
+
+  .hint{
+    margin-top:56px;
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .hint .arrow{ animation:bob 1.8s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
+
+  /* ---------- SECTION HEADS ---------- */
+  .section-head{ text-align:center; margin:0 0 64px; }
+  .section-head .eyebrow{ margin-bottom:14px; }
+  .section-head h2{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:clamp(30px, 4.5vw, 42px);
+    margin:0;
+  }
+
+  /* ---------- FLOW ---------- */
+  .flow{ position:relative; padding:60px 0 40px; }
+  .thread-svg{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    width:2px;
+    height:100%;
+    z-index:0;
+  }
+  .thread-path{
+    stroke:var(--steel);
+    stroke-width:2;
+    fill:none;
+    stroke-dasharray:1;
+    stroke-dashoffset:1;
+    opacity:.4;
+  }
+
+  .steps{ list-style:none; margin:0; padding:0; position:relative; z-index:1; }
+  .step{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    margin-bottom:14px;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .step.in{ opacity:1; transform:translateY(0); }
+
+  .step-marker{
+    flex:0 0 auto;
+    width:56px; height:56px;
+    border-radius:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    color:var(--steel);
+    box-shadow:var(--shadow);
+    position:relative;
+    margin-top:6px;
+  }
+  .step-marker::after{
+    content:'';
+    position:absolute; inset:-6px;
+    border-radius:16px;
+    border:1px solid var(--line);
+    opacity:0;
+    transition:opacity .3s ease, transform .3s ease;
+    transform:scale(.85);
+  }
+  .step.in .step-marker::after{ opacity:1; transform:scale(1); }
+
+  .card{
+    flex:1 1 auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .card:hover{ border-color:rgba(63,106,134,0.45); transform:translateY(-2px); }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+  }
+  .card-title{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+  }
+  .card-summary{
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    line-height:1.55;
+  }
+  .chevron{
+    flex:0 0 auto;
+    width:22px; height:22px;
+    color:var(--ink-soft);
+    transition:transform .3s ease;
+  }
+  .card.open .chevron{ transform:rotate(135deg); }
+
+  .card-detail{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .4s ease, margin-top .4s ease;
+  }
+  .card.open .card-detail{ margin-top:16px; }
+  .card-detail-inner{
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .tag-row{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:6px;
+    background:var(--bg-deep);
+    color:var(--ink-soft);
+  }
+
+  /* ---------- UNDER THE HOOD ---------- */
+  .satellites{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:28px;
+  }
+  @media (max-width:640px){ .satellites{ grid-template-columns:1fr; } }
+  .sat-card{
+    background:var(--card);
+    border:1px dashed var(--line);
+    border-radius:14px;
+    padding:24px;
+  }
+  .sat-card h3{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:20px;
+    margin:0 0 8px;
+    color:var(--amber);
+  }
+  .sat-card p{
+    margin:0;
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- STACK STRIP ---------- */
+  .stack{
+    margin:110px 0 60px;
+    padding-top:40px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:20px;
+    align-items:center;
+  }
+  .stack-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .stack-items{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  footer{
+    text-align:center;
+    padding:20px 0 70px;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+
+  @media (max-width:640px){
+    .step{ gap:16px; }
+    .step-marker{ width:44px; height:44px; font-size:12px; }
+    .card{ padding:18px; }
+    .thread-svg{ left:22px; }
+    .flow{ padding-left:0; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="blueprint"></div>
+  <div class="wrap">
+    <div class="eyebrow">Кейс · Десктоп-приложение</div>
+    <h1 class="title">Транспортная <em>система</em></h1>
+    <p class="subtitle">Рабочее место диспетчера: заявки, справочники техники и водителей,
+      план по каждой единице транспорта — в одном окне, без сервера.</p>
+    <div class="hero-badges">
+      <span class="badge">Заявки на транспорт</span>
+      <span class="badge">Справочники и график</span>
+      <span class="badge">Жизненный цикл статусов</span>
+      <span class="badge">Дипломный проект</span>
+    </div>
+    <div class="hint"><span class="arrow">↓</span> путь диспетчера</div>
+  </div>
+</section>
+
+<section class="wrap flow">
+  <svg class="thread-svg" preserveAspectRatio="none">
+    <path class="thread-path" id="threadPath" d="M1,0 L1,1000"></path>
+  </svg>
+
+  <div class="section-head">
+    <div class="eyebrow">Шаг за шагом</div>
+    <h2>Как диспетчер ведёт заявку</h2>
+  </div>
+
+  <ul class="steps" id="steps">
+
+    <li class="step">
+      <div class="step-marker">01</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Новая заявка</h3>
+            <p class="card-summary">Груз и требования к транспорту — в одной форме.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Блок «Груз»: тоннаж, габариты, пункты погрузки и отгрузки, даты. Блок «Транспорт»:
+          категория, марка, гос. номер, прицеп, водитель, время работы. Заявке автоматически
+          присваивается номер вида <code>003/2026</code> и статус «Оформляется».
+          <div class="tag-row"><span class="tag">форма из двух блоков</span><span class="tag">авто-нумерация</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">02</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Справочники</h3>
+            <p class="card-summary">Водители, транспорт и прицепы — общая база для всех форм.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          У каждого водителя — карточка с данными водительского удостоверения и сроком
+          действия. У техники — категория, грузоподъёмность, состояние. Эти списки сами
+          подставляются в выпадающие поля заявки — вводить одно и то же дважды не нужно.
+          <div class="tag-row"><span class="tag">ВУ и сроки</span><span class="tag">единый источник данных</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">03</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Планирование в графике</h3>
+            <p class="card-summary">Календарь и детализация по каждой категории техники.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Вкладка «График» разбита по типам техники: тягачи, автобусы, краны, грузовые
+          и легковые. Слева — список транспорта конкретной категории, справа — календарь
+          и таблица заявок с отметкой «включить в график» по каждому рейсу.
+          <div class="tag-row"><span class="tag">5 категорий техники</span><span class="tag">включение в график</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">04</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Жизненный цикл заявки</h3>
+            <p class="card-summary">Оформляется → Исполняется → Выполнена.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Пока заявка в статусе «Оформляется», её можно свободно менять или удалить.
+          Как только рейс переходит в «Исполняется» — редактирование блокируется, а
+          «Выполнена» закрывает заявку окончательно. Так исключаются случайные правки
+          по уже идущему рейсу.
+          <div class="tag-row"><span class="tag">блокировка по статусу</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">05</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Сохранение</h3>
+            <p class="card-summary">Каждое изменение сразу пишется на диск.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Заявки, водители, транспорт и прицепы хранятся в отдельных JSON-файлах прямо
+          рядом с приложением. Сервер и база данных не нужны — программа работает
+          автономно на любом компьютере диспетчера.
+          <div class="tag-row"><span class="tag">requests.json</span><span class="tag">без сервера</span></div>
+        </div></div>
+      </div>
+    </li>
+
+  </ul>
+</section>
+
+<section class="wrap">
+  <div class="section-head" style="margin-bottom:36px;">
+    <div class="eyebrow">Под капотом</div>
+    <h2>Что держит всё вместе</h2>
+  </div>
+  <div class="satellites">
+    <div class="sat-card">
+      <h3>Табличный интерфейс</h3>
+      <p>Списки заявок, водителей и техники — в виде таблиц. Двойной клик по строке
+      открывает карточку редактирования в новой вкладке, рядом с остальными открытыми.</p>
+    </div>
+    <div class="sat-card">
+      <h3>Единый toolbar</h3>
+      <p>Во всех формах — один и тот же набор иконок: сохранить, удалить, отменить,
+      добавить. Диспетчеру не нужно заново привыкать к каждому разделу программы.</p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <span class="stack-label">Стек</span>
+    <div class="stack-items">
+      <span class="badge">Python</span>
+      <span class="badge">Tkinter / ttk</span>
+      <span class="badge">tkcalendar</span>
+      <span class="badge">JSON</span>
+    </div>
+  </div>
+</section>
+
+<footer>Кейс подготовлен для портфолио · нажмите на карточку, чтобы раскрыть детали</footer>
+
+<script>
+  // reveal steps on scroll
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, { threshold: 0.3 });
+  steps.forEach(s=>io.observe(s));
+
+  // expand/collapse cards
+  document.querySelectorAll('.card').forEach(card=>{
+    const detail = card.querySelector('.card-detail');
+    card.addEventListener('click', ()=>{
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.card.open').forEach(c=>{
+        if(c!==card){
+          c.classList.remove('open');
+          c.querySelector('.card-detail').style.maxHeight = null;
+        }
+      });
+      if(isOpen){
+        card.classList.remove('open');
+        detail.style.maxHeight = null;
+      } else {
+        card.classList.add('open');
+        detail.style.maxHeight = detail.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // draw thread line as page scrolls, sized to the steps list
+  const path = document.getElementById('threadPath');
+  const svg = document.querySelector('.thread-svg');
+  const stepsList = document.getElementById('steps');
+
+  function sizeThread(){
+    const h = stepsList.offsetHeight;
+    svg.setAttribute('viewBox', `0 0 2 ${h}`);
+    path.setAttribute('d', `M1,0 L1,${h}`);
+    const len = h;
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+  }
+  sizeThread();
+  window.addEventListener('resize', sizeThread);
+
+  function updateThread(){
+    const rect = stepsList.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = rect.height;
+    let progress = (vh*0.75 - rect.top) / total;
+    progress = Math.max(0, Math.min(1, progress));
+    const len = total;
+    path.style.strokeDashoffset = len * (1-progress);
+  }
+  document.addEventListener('scroll', updateThread);
+  updateThread();
+</script>
+
+</body>
+</html>

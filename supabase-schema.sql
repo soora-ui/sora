@@ -18,8 +18,12 @@ create table if not exists public.works (
   role        text,                             -- роль / что сделано
   link        text,                             -- ссылка на проект
   cover_url   text,                             -- обложка
-  gallery     text[] not null default '{}'      -- галерея изображений
+  gallery     text[] not null default '{}',     -- галерея изображений
+  flow_url    text                              -- страница с разбором флоу (открывается поп-апом)
 );
+
+-- Миграция для уже существующей таблицы (если создавалась до появления flow_url)
+alter table public.works add column if not exists flow_url text;
 
 alter table public.works enable row level security;
 
@@ -86,4 +90,18 @@ values
   (3, 'Смета PDF',            'react · pdf',       'MVP для строительных бригад — быстрое создание смет с экспортом в PDF.',                                                    2024, '{React,Vite}', 'MVP'),
   (4, 'Transport',            'tracking',          'Трекинг транспорта в реальном времени.',                                                                                   2023, '{Node.js}', 'Разработка'),
   (5, 'Личная автоматизация', 'ai · automation',   'Инструменты для автоматизации документооборота и персональных процессов. AI-агенты для рутинных задач.',                   2025, '{Python,AI}', 'Автоматизация')
+on conflict do nothing;
+
+
+-- 4) FLOW-СТРАНИЦЫ: привязка к кейсам --------------------------
+--  Выполняется один раз. Привязывает готовые flow-страницы (лежат
+--  рядом с index.html в репозитории) к соответствующим работам
+--  и добавляет 2 новых кейса, под которые эти flow были сделаны.
+update public.works set flow_url = 'diplom-flow.html'   where title = 'Transport';
+update public.works set flow_url = 'gracessa-flow.html' where title = 'Tarot Bot';
+
+insert into public.works (position, title, tag, short_desc, year, stack, role, flow_url)
+values
+  (6, 'TraffBot',       'telegram · bot', 'Личный кабинет для команды трафферов — баланс, вывод в SOL и заявки, которые админ разбирает в два клика.', 2025, '{Python,Telegram,Solana}', 'Разработка', 'traff-flow.html'),
+  (7, 'WB Price Scanner', 'parser · bot', 'Фоновый бот проходит по Wildberries раз в минуту в поиске техники Apple дешевле рынка и мгновенно пишет в Telegram.', 2025, '{Python,Parsing,Telegram}', 'Разработка', 'parser-flow.html')
 on conflict do nothing;

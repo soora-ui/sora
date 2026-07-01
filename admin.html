@@ -204,6 +204,16 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
           <div class="hint">Скриншоты внутри кейса. Можно загрузить несколько.</div>
         </div>
 
+        <div class="field">
+          <label>Flow-страница (интерактивный разбор кейса)</label>
+          <input type="text" id="f_flow_url" placeholder="https://… или имя файла, напр. traff-flow.html">
+          <div style="display:flex; align-items:center; gap:.75rem; margin-top:.6rem;">
+            <input type="file" id="flowFile" accept=".html,text/html">
+            <a href="#" target="_blank" id="flowPreviewLink" class="hint hidden">Открыть →</a>
+          </div>
+          <div class="hint">На сайте появится кнопка «Смотреть флоу», страница откроется поп-апом. Можно загрузить готовый HTML-файл или вставить ссылку/имя файла вручную.</div>
+        </div>
+
         <div class="row">
           <div class="field">
             <label>Порядок (position)</label>
@@ -349,10 +359,11 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
     $('f_role').value = w.role || '';
     $('f_position').value = (w.position!=null ? w.position : 0);
     $('f_published').checked = w.published !== false;
+    $('f_flow_url').value = w.flow_url || '';
     coverUrl = w.cover_url || '';
     gallery = Array.isArray(w.gallery) ? w.gallery.slice() : [];
-    renderCover(); renderGallery();
-    $('coverFile').value=''; $('galleryFile').value='';
+    renderCover(); renderGallery(); renderFlowPreview();
+    $('coverFile').value=''; $('galleryFile').value=''; $('flowFile').value='';
     $('deleteBtn').style.display = w.id ? '' : 'none';
     $('listView').classList.add('hidden');
     $('editorView').classList.remove('hidden');
@@ -374,10 +385,25 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
     });
   }
 
+  function renderFlowPreview(){
+    const url = $('f_flow_url').value.trim();
+    const link = $('flowPreviewLink');
+    if (url){ link.href = url; link.classList.remove('hidden'); }
+    else { link.classList.add('hidden'); }
+  }
+  $('f_flow_url').addEventListener('input', renderFlowPreview);
+
   async function uploadImage(file){
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = `${crypto.randomUUID()}.${ext}`;
     const { error } = await sb.storage.from('works').upload(path, file, { cacheControl:'3600', upsert:false });
+    if (error) throw error;
+    return sb.storage.from('works').getPublicUrl(path).data.publicUrl;
+  }
+
+  async function uploadFlowFile(file){
+    const path = `flows/${crypto.randomUUID()}.html`;
+    const { error } = await sb.storage.from('works').upload(path, file, { cacheControl:'3600', upsert:false, contentType:'text/html' });
     if (error) throw error;
     return sb.storage.from('works').getPublicUrl(path).data.publicUrl;
   }
@@ -398,6 +424,16 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
     } catch(err){ toast(err.message, true); }
   });
 
+  $('flowFile').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if (!file) return;
+    toast('Загрузка flow-страницы…');
+    try {
+      $('f_flow_url').value = await uploadFlowFile(file);
+      renderFlowPreview();
+      toast('Flow-страница загружена');
+    } catch(err){ toast(err.message, true); }
+  });
+
   $('workForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
     $('saveBtn').disabled = true; $('saveBtn').textContent = 'Сохранение…';
@@ -413,7 +449,8 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
       position: parseInt($('f_position').value,10) || 0,
       published: $('f_published').checked,
       cover_url: coverUrl || null,
-      gallery: gallery
+      gallery: gallery,
+      flow_url: val($('f_flow_url'))
     };
     const id = $('f_id').value;
     let res;

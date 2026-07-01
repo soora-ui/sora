@@ -675,7 +675,37 @@ footer {
 .case-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
 .case-gallery img { width: 100%; border-radius: 0.9rem; border: 0.5px solid var(--line); display: block; }
 .case-link { display: inline-flex; }
+.case-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 @media (max-width: 640px) { .case-body { padding: 1.75rem 1.5rem 2.5rem; } }
+
+/* ——— FLOW POPUP (интерактивный разбор кейса) ——— */
+.flow-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(28,25,23,0.6);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 3vh 1.5rem; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+.flow-overlay.open { opacity: 1; pointer-events: auto; }
+.flow-modal {
+  background: var(--cream); border-radius: 1.25rem; max-width: 980px; width: 100%;
+  height: 94vh; position: relative; overflow: hidden;
+  transform: translateY(24px) scale(0.98); transition: transform 0.5s var(--ease);
+  box-shadow: 0 40px 90px -30px rgba(28,25,23,0.6);
+}
+.flow-overlay.open .flow-modal { transform: none; }
+.flow-modal iframe { width: 100%; height: 100%; border: none; display: block; }
+.flow-close {
+  position: absolute; top: 1rem; right: 1rem; z-index: 4;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: rgba(248,245,240,0.9); color: var(--ink); font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.3s var(--ease);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.flow-close:hover { transform: rotate(90deg); }
+@media (max-width: 640px) { .flow-modal { height: 96vh; border-radius: 1rem; } }
 
 /* ——— REDUCED MOTION ——— */
 @media (prefers-reduced-motion: reduce) {
@@ -878,8 +908,19 @@ footer {
       <p class="case-role" id="caseRole"></p>
       <div class="case-long" id="caseLong"></div>
       <div class="case-gallery" id="caseGallery"></div>
-      <a class="btn btn-primary case-link" id="caseLink" target="_blank" rel="noopener">Открыть проект →</a>
+      <div class="case-actions">
+        <a class="btn btn-primary case-link" id="caseLink" target="_blank" rel="noopener">Открыть проект →</a>
+        <button class="btn btn-ghost" id="caseFlowBtn" type="button">Смотреть флоу →</button>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- FLOW POPUP -->
+<div class="flow-overlay" id="flowOverlay" aria-hidden="true">
+  <div class="flow-modal" role="dialog" aria-modal="true">
+    <button class="flow-close" id="flowClose" aria-label="Закрыть">×</button>
+    <iframe id="flowIframe" src="" title="Разбор флоу"></iframe>
   </div>
 </div>
 
@@ -907,7 +948,8 @@ const DEMO_WORKS = [
     tag: 'telegram · bot',
     title: 'Tarot Bot',
     desc: 'Бот с платёжной системой. Персонализированные расклады, подписки, Telegram Payments.',
-    link: '#'
+    link: '#',
+    flow_url: 'gracessa-flow.html'
   },
   {
     id: 'team-analytics',
@@ -928,7 +970,8 @@ const DEMO_WORKS = [
     tag: 'tracking',
     title: 'Transport',
     desc: 'Трекинг транспорта в реальном времени.',
-    link: '#'
+    link: '#',
+    flow_url: 'diplom-flow.html'
   },
   {
     id: 'automation',
@@ -936,6 +979,22 @@ const DEMO_WORKS = [
     title: 'Личная автоматизация',
     desc: 'Инструменты для автоматизации документооборота и персональных процессов. AI-агенты для рутинных задач.',
     link: '#'
+  },
+  {
+    id: 'traffbot',
+    tag: 'telegram · bot',
+    title: 'TraffBot',
+    desc: 'Личный кабинет для команды трафферов — баланс, вывод в SOL и заявки, которые админ разбирает в два клика.',
+    link: '#',
+    flow_url: 'traff-flow.html'
+  },
+  {
+    id: 'wb-price-scanner',
+    tag: 'parser · bot',
+    title: 'WB Price Scanner',
+    desc: 'Фоновый бот проходит по Wildberries раз в минуту в поиске техники Apple дешевле рынка и мгновенно пишет в Telegram.',
+    link: '#',
+    flow_url: 'parser-flow.html'
   }
 ];
 
@@ -1127,6 +1186,10 @@ function openCase(w) {
   if (w.link && w.link !== '#') { link.href = w.link; link.style.display = ''; }
   else { link.style.display = 'none'; }
 
+  const flowBtn = document.getElementById('caseFlowBtn');
+  if (w.flow_url) { flowBtn.style.display = ''; flowBtn.onclick = () => openFlow(w.flow_url); }
+  else { flowBtn.style.display = 'none'; flowBtn.onclick = null; }
+
   ov.classList.add('open');
   ov.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
@@ -1141,7 +1204,28 @@ function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;
 
 document.getElementById('caseClose').addEventListener('click', closeCase);
 document.getElementById('caseOverlay').addEventListener('click', (e) => { if (e.target.id === 'caseOverlay') closeCase(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCase(); });
+
+/* ——— FLOW POPUP (интерактивный разбор кейса поверх модалки) ——— */
+function openFlow(url) {
+  const ov = document.getElementById('flowOverlay');
+  document.getElementById('flowIframe').src = url;
+  ov.classList.add('open');
+  ov.setAttribute('aria-hidden', 'false');
+}
+function closeFlow() {
+  const ov = document.getElementById('flowOverlay');
+  ov.classList.remove('open');
+  ov.setAttribute('aria-hidden', 'true');
+  document.getElementById('flowIframe').src = '';
+}
+document.getElementById('flowClose').addEventListener('click', closeFlow);
+document.getElementById('flowOverlay').addEventListener('click', (e) => { if (e.target.id === 'flowOverlay') closeFlow(); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('flowOverlay').classList.contains('open')) closeFlow();
+  else closeCase();
+});
 
 /* ——— LOAD WORKS (Supabase → fallback DEMO_WORKS) ——— */
 async function loadWorks() {
@@ -1156,7 +1240,8 @@ async function loadWorks() {
         works = data.map(r => ({
           id: r.id, tag: r.tag, title: r.title, desc: r.short_desc,
           long_desc: r.long_desc, year: r.year, stack: r.stack || [],
-          role: r.role, link: r.link, cover_url: r.cover_url, gallery: r.gallery || []
+          role: r.role, link: r.link, cover_url: r.cover_url, gallery: r.gallery || [],
+          flow_url: r.flow_url || null
         }));
       }
     } catch (e) {
