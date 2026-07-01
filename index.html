@@ -908,10 +908,7 @@ footer {
       <p class="case-role" id="caseRole"></p>
       <div class="case-long" id="caseLong"></div>
       <div class="case-gallery" id="caseGallery"></div>
-      <div class="case-actions">
-        <a class="btn btn-primary case-link" id="caseLink" target="_blank" rel="noopener">Открыть проект →</a>
-        <button class="btn btn-ghost" id="caseFlowBtn" type="button">Смотреть флоу →</button>
-      </div>
+      <a class="btn btn-primary case-link" id="caseLink" target="_blank" rel="noopener">Открыть проект →</a>
     </div>
   </div>
 </div>
@@ -1041,7 +1038,7 @@ function renderWorks() {
       <span class="card-big-num">${num}</span>
       <span class="card-link" aria-hidden="true">↗</span>
     `;
-    card.addEventListener('click', () => openCase(w));
+    card.addEventListener('click', () => { if (w.flow_url) openFlow(w.flow_url); else openCase(w); });
     bento.appendChild(card);
   });
   attachTilt();
@@ -1191,10 +1188,6 @@ function openCase(w) {
   const link = document.getElementById('caseLink');
   if (w.link && w.link !== '#') { link.href = w.link; link.style.display = ''; }
   else { link.style.display = 'none'; }
-
-  const flowBtn = document.getElementById('caseFlowBtn');
-  if (w.flow_url) { flowBtn.style.display = ''; flowBtn.onclick = () => openFlow(w.flow_url); }
-  else { flowBtn.style.display = 'none'; flowBtn.onclick = null; }
 
   ov.classList.add('open');
   ov.setAttribute('aria-hidden', 'false');
