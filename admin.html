@@ -193,6 +193,7 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
             <div>
               <input type="file" id="coverFile" accept="image/*">
               <div class="hint">Показывается в шапке кейса. Рекомендую 16:10.</div>
+                <button type="button" class="btn danger sm hidden" id="coverRemove" style="margin-top:.5rem;">Удалить обложку</button>
             </div>
           </div>
         </div>
@@ -258,6 +259,10 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+  function renderCover(){
+  $('coverPrev').style.backgroundImage = coverUrl ? `url('${coverUrl}')` : 'none';
+  $('coverRemove').classList.toggle('hidden', !coverUrl);
+}
 (function(){
   const cfg = window.SORA_CONFIG || {};
   const configured = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('YOUR-PROJECT') && cfg.SUPABASE_ANON_KEY && !cfg.SUPABASE_ANON_KEY.includes('YOUR-');
@@ -291,6 +296,13 @@ h1,h2,h3 { font-family:'DM Serif Display',serif; font-weight:400; }
     $('loginBtn').disabled = false; $('loginBtn').textContent = 'Войти';
     if (error) toast(error.message || 'Не удалось войти', true);
   });
+
+  $('coverRemove').addEventListener('click', ()=>{
+  coverUrl = '';
+  $('coverFile').value = '';
+  renderCover();
+  toast('Обложка убрана — не забудь сохранить');
+});
 
   $('logoutBtn').addEventListener('click', async ()=>{ await sb.auth.signOut(); });
 
