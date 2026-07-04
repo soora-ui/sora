@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кико — user flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FBFAF7;
+    --bg-deep: #F2EFE8;
+    --card: #ffffff;
+    --ink: #3A3733;
+    --ink-soft: #8B857C;
+    --line: rgba(58,55,51,0.08);
+    --sakura: #E8B4B8;
+    --sage: #A8C3A0;
+    --terracotta: #D98E73;
+    --shadow: 0 20px 45px -30px rgba(58,55,51,0.28);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(232,180,184,0.16), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(168,195,160,0.14), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:130px 0 80px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .enso-wrap{
+    position:absolute;
+    top:-30px; left:50%;
+    transform:translateX(-50%);
+    width:520px; height:520px;
+    pointer-events:none;
+  }
+  .enso-svg{ width:100%; height:100%; }
+  .enso-stroke{
+    fill:none;
+    stroke:var(--sakura);
+    stroke-width:3;
+    stroke-linecap:round;
+    opacity:.4;
+    stroke-dasharray:900;
+    stroke-dashoffset:900;
+    animation: draw-enso 2.6s cubic-bezier(0.32,0.72,0,1) forwards .3s;
+  }
+  @keyframes draw-enso{ to{ stroke-dashoffset:60; } }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--sakura);
+    -webkit-text-stroke:0.2px var(--terracotta);
+    color:#c98a90;
+    margin-bottom:22px;
+  }
+  h1.title{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:clamp(52px, 10vw, 96px);
+    line-height:1;
+    margin:0 0 20px;
+    letter-spacing:.01em;
+    position:relative;
+  }
+  h1.title em{
+    font-style:italic;
+    font-weight:500;
+    color:#c98a90;
+  }
+  .subtitle{
+    max-width:500px;
+    margin:0 auto;
+    color:var(--ink-soft);
+    font-size:17px;
+    line-height:1.6;
+    position:relative;
+  }
+  .hero-badges{
+    margin-top:38px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    position:relative;
+  }
+  .badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.7);
+    color:var(--ink-soft);
+  }
+
+  .live-cta{
+    margin-top:34px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink);
+    text-decoration:none;
+    padding:11px 20px;
+    border-radius:999px;
+    background:var(--card);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow);
+    transition:transform .25s ease, border-color .25s ease;
+    position:relative;
+  }
+  .live-cta:hover{ transform:translateY(-2px); border-color:rgba(232,180,184,0.6); }
+  .live-cta .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--sage);
+    box-shadow:0 0 0 0 rgba(168,195,160,0.55);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(168,195,160,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(168,195,160,0); }
+    100%{ box-shadow:0 0 0 0 rgba(168,195,160,0); }
+  }
+
+  .hint{
+    margin-top:52px;
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    position:relative;
+  }
+  .hint .arrow{ animation:bob 1.8s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(6px);} }
+
+  /* ---------- SECTION HEADS ---------- */
+  .section-head{ text-align:center; margin:0 0 64px; }
+  .section-head .eyebrow{ margin-bottom:14px; }
+  .section-head h2{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:clamp(30px, 4.5vw, 42px);
+    margin:0;
+  }
+
+  /* ---------- FLOW ---------- */
+  .flow{ position:relative; padding:60px 0 40px; }
+  .thread-svg{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform:translateX(-50%);
+    width:2px;
+    height:100%;
+    z-index:0;
+  }
+  .thread-path{
+    stroke:#c98a90;
+    stroke-width:2;
+    fill:none;
+    stroke-dasharray:1;
+    stroke-dashoffset:1;
+    opacity:.4;
+  }
+
+  .steps{ list-style:none; margin:0; padding:0; position:relative; z-index:1; }
+  .step{
+    display:flex;
+    gap:28px;
+    align-items:flex-start;
+    margin-bottom:14px;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .step.in{ opacity:1; transform:translateY(0); }
+
+  .step-marker{
+    flex:0 0 auto;
+    width:56px; height:56px;
+    border-radius:50%;
+    background:var(--card);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:14px;
+    color:#c98a90;
+    box-shadow:var(--shadow);
+    position:relative;
+    margin-top:6px;
+  }
+  .step-marker::after{
+    content:'';
+    position:absolute; inset:-6px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    opacity:0;
+    transition:opacity .3s ease, transform .3s ease;
+    transform:scale(.85);
+  }
+  .step.in .step-marker::after{ opacity:1; transform:scale(1); }
+
+  .card{
+    flex:1 1 auto;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:1.75rem;
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .card:hover{ border-color:rgba(232,180,184,0.55); transform:translateY(-2px); }
+  .card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+  }
+  .card-title{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+  }
+  .card-summary{
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-size:14.5px;
+    line-height:1.55;
+  }
+  .chevron{
+    flex:0 0 auto;
+    width:22px; height:22px;
+    color:var(--ink-soft);
+    transition:transform .3s ease;
+  }
+  .card.open .chevron{ transform:rotate(135deg); }
+
+  .card-detail{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .4s ease, margin-top .4s ease;
+  }
+  .card.open .card-detail{ margin-top:16px; }
+  .card-detail-inner{
+    border-top:1px solid var(--line);
+    padding-top:16px;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .tag-row{ margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:999px;
+    background:var(--bg-deep);
+    color:var(--ink-soft);
+  }
+
+  /* ---------- UNDER THE HOOD ---------- */
+  .satellites{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:28px;
+  }
+  @media (max-width:640px){ .satellites{ grid-template-columns:1fr; } }
+  .sat-card{
+    background:var(--card);
+    border:1px dashed var(--line);
+    border-radius:1.75rem;
+    padding:24px;
+  }
+  .sat-card h3{
+    font-family:'Cormorant Garamond', serif;
+    font-weight:600;
+    font-size:20px;
+    margin:0 0 8px;
+    color:var(--terracotta);
+  }
+  .sat-card p{
+    margin:0;
+    font-size:14.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- STACK STRIP ---------- */
+  .stack{
+    margin:110px 0 60px;
+    padding-top:40px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:20px;
+    align-items:center;
+  }
+  .stack-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .stack-items{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  footer{
+    text-align:center;
+    padding:20px 0 70px;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+
+  @media (max-width:640px){
+    .step{ gap:16px; }
+    .step-marker{ width:44px; height:44px; font-size:12px; }
+    .card{ padding:18px; }
+    .thread-svg{ left:22px; }
+    .flow{ padding-left:0; }
+    .enso-wrap{ width:380px; height:380px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="enso-wrap">
+    <svg class="enso-svg" viewBox="0 0 200 200">
+      <path class="enso-stroke" d="M100,25 A75,75 0 1 1 32,150" />
+    </svg>
+  </div>
+  <div class="wrap">
+    <div class="eyebrow">Кейс · Личный PWA-инструмент</div>
+    <h1 class="title">Ки<em>ко</em></h1>
+    <p class="subtitle">Трекер вопросов для первой линии поддержки: зафиксировать за
+      5 секунд, не забыть, пока не закрыто, и красиво отчитаться в конце недели.</p>
+    <div class="hero-badges">
+      <span class="badge">Захват вопроса за 5 сек</span>
+      <span class="badge">Эскалирующие push</span>
+      <span class="badge">PDF-отчёт</span>
+      <span class="badge">PWA на iPhone</span>
+    </div>
+    <a class="live-cta" href="https://soora-ui.github.io/kiko/#/report" target="_blank" rel="noopener">
+      <span class="dot"></span> Открыть демо ↗
+    </a>
+    <div class="hint"><span class="arrow">↓</span> путь одного вопроса</div>
+  </div>
+</section>
+
+<section class="wrap flow">
+  <svg class="thread-svg" preserveAspectRatio="none">
+    <path class="thread-path" id="threadPath" d="M1,0 L1,1000"></path>
+  </svg>
+
+  <div class="section-head">
+    <div class="eyebrow">Шаг за шагом</div>
+    <h2>Что происходит с вопросом</h2>
+  </div>
+
+  <ul class="steps" id="steps">
+
+    <li class="step">
+      <div class="step-marker">01</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Быстрый ввод</h3>
+            <p class="card-summary">Одно текстовое поле — и вопрос уже в ленте.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Модалка поверх любого экрана: автофокус на поле, три чипа приоритета
+          (🔥 Срочно / ◯ Обычно / ・Потом), кнопка «Сохранить» — и всё. Цель — уложиться
+          в 5 секунд, не отрываясь от разговора с человеком.
+          <div class="tag-row"><span class="tag">≤ 5 секунд</span><span class="tag">2 действия</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">02</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Лента «Сегодня»</h3>
+            <p class="card-summary">Счётчик сверху, карточки вопросов, свайпы для действий.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Крупная сводка «Открыто / Срочно / Жду ответа», ниже — лента, отсортированная
+          по срочности. Свайп вправо по карточке закрывает вопрос, свайп влево —
+          откладывает (+1 ч, +4 ч, завтра утром).
+          <div class="tag-row"><span class="tag">свайп-жесты</span><span class="tag">сортировка по срочности</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">03</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Эскалирующие напоминания</h3>
+            <p class="card-summary">Пуш не отстанет, пока вопрос не закрыт.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Каждый статус — свой ритм: «в работе» напоминает раз в 4 часа, «жду ответа» —
+          раз в день. После трёх отложенных напоминаний интервал сокращается вдвое,
+          а в тексте пуша появляется «⚠️ Уже 3 раза откладывал» — вопрос физически
+          невозможно забыть.
+          <div class="tag-row"><span class="tag">Web Push</span><span class="tag">только рабочие часы</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">04</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">Закрытие вопроса</h3>
+            <p class="card-summary">Без «как решили» — статус не переключится.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Карточка вопроса хранит полную историю действий таймлайном. Чтобы закрыть —
+          нужно одной строкой описать решение: это поле обязательно и становится
+          материалом для будущего отчёта.
+          <div class="tag-row"><span class="tag">обязательный resolution</span><span class="tag">лог действий</span></div>
+        </div></div>
+      </div>
+    </li>
+
+    <li class="step">
+      <div class="step-marker">05</div>
+      <div class="card">
+        <div class="card-top">
+          <div>
+            <h3 class="card-title">PDF-отчёт</h3>
+            <p class="card-summary">Период выбрал — файл готов, можно сразу отправить.</p>
+          </div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="card-detail"><div class="card-detail-inner">
+          Сегодня / эта неделя / произвольный диапазон — и приложение собирает
+          сводку (пришло, закрыто, среднее время закрытия, топ-авторы), таблицу
+          закрытых вопросов и список открытых на конец периода. Кнопка «Поделиться»
+          открывает системную шторку iOS — можно отправить руководителю прямо
+          в Telegram или почту.
+          <div class="tag-row"><span class="tag">@react-pdf/renderer</span><span class="tag">navigator.share</span></div>
+        </div></div>
+      </div>
+    </li>
+
+  </ul>
+</section>
+
+<section class="wrap">
+  <div class="section-head" style="margin-bottom:36px;">
+    <div class="eyebrow">Под капотом</div>
+    <h2>Что держит всё вместе</h2>
+  </div>
+  <div class="satellites">
+    <div class="sat-card">
+      <h3>PWA + Web Push на iPhone</h3>
+      <p>На iOS пуши работают только из установленного на «Домой» приложения —
+      поэтому есть онбординг-экран, который сам определяет режим запуска и
+      подсказывает, как поставить PWA правильно.</p>
+    </div>
+    <div class="sat-card">
+      <h3>Кириллица в PDF</h3>
+      <p>Шрифт регистрируется вручную в <code>@react-pdf/renderer</code> — без этого
+      русский текст в отчёте превращается в кракозябры. Мелкая, но критичная деталь.</p>
+    </div>
+  </div>
+
+  <div class="stack">
+    <span class="stack-label">Стек</span>
+    <div class="stack-items">
+      <span class="badge">React / Vite / TS</span>
+      <span class="badge">Tailwind CSS</span>
+      <span class="badge">Supabase + pg_cron</span>
+      <span class="badge">@react-pdf/renderer</span>
+      <span class="badge">Vercel</span>
+    </div>
+  </div>
+</section>
+
+<footer>Кейс подготовлен для портфолио · нажмите на карточку, чтобы раскрыть детали</footer>
+
+<script>
+  // reveal steps on scroll
+  const steps = document.querySelectorAll('.step');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); }
+    });
+  }, { threshold: 0.3 });
+  steps.forEach(s=>io.observe(s));
+
+  // expand/collapse cards
+  document.querySelectorAll('.card').forEach(card=>{
+    const detail = card.querySelector('.card-detail');
+    card.addEventListener('click', ()=>{
+      const isOpen = card.classList.contains('open');
+      document.querySelectorAll('.card.open').forEach(c=>{
+        if(c!==card){
+          c.classList.remove('open');
+          c.querySelector('.card-detail').style.maxHeight = null;
+        }
+      });
+      if(isOpen){
+        card.classList.remove('open');
+        detail.style.maxHeight = null;
+      } else {
+        card.classList.add('open');
+        detail.style.maxHeight = detail.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // draw thread line as page scrolls, sized to the steps list
+  const path = document.getElementById('threadPath');
+  const svg = document.querySelector('.thread-svg');
+  const stepsList = document.getElementById('steps');
+
+  function sizeThread(){
+    const h = stepsList.offsetHeight;
+    svg.setAttribute('viewBox', `0 0 2 ${h}`);
+    path.setAttribute('d', `M1,0 L1,${h}`);
+    const len = h;
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+  }
+  sizeThread();
+  window.addEventListener('resize', sizeThread);
+
+  function updateThread(){
+    const rect = stepsList.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = rect.height;
+    let progress = (vh*0.75 - rect.top) / total;
+    progress = Math.max(0, Math.min(1, progress));
+    const len = total;
+    path.style.strokeDashoffset = len * (1-progress);
+  }
+  document.addEventListener('scroll', updateThread);
+  updateThread();
+</script>
+
+</body>
+</html>
